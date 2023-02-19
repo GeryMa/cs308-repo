@@ -1,17 +1,56 @@
-const Spells = require('./Spells.js');
 class Player{
-    constructor(name, classType){
-        this._name = name;
-        this._classType = classType;
-        if(this._classType == 1){
-            this._plyerClass = new playerClass(1/* warrior */);
-        }else if(this._classType == 2){
-            this._plyerClass = new playerClass(2/* wizard */);
-            this._plyerClass.generateSpells();
+    constructor(name){
+            //warrior class
+            this._name = name;
+            this._health = 150;
+            this._AC = 19;
+            this._wis = 13;
+            this._intim = 15;
+            this._hitBonus = 4;
+    }
+    takeDamage(damage){
+
+    }
+    attack(){
+
+    }
+    addGold(x){
+        if(x > 0){
+            this._gold += x;
         }
     }
-    castSpell(spellSlot){
-        
+
+    //getters
+    getHealth(){
+        return this._health;
+    }
+    getAC(){
+        return this._AC;
+    }
+    getWis(){
+        return this._wis;
+    }
+    getIntim(){
+        return this._intim;
+    }
+    getHitBonus(){
+        return this._hitBonus;
+    }
+    //setters
+    setHealth(x){
+        this._health = x;
+    }
+    setAC(x){
+        this._AC = x;
+    }
+    setWis(x){
+        this._wis = x;
+    }
+    setIntim(x){
+        this._intim = x;
+    }
+    setHitBonus(x){
+        this._hitBonus = x;
     }
 }
 module.exports = Player;
