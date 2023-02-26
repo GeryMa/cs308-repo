@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>mario</title>
+        <style>
+            canvas{
+                border: 1px solid black;
+            }
+        </style>
+        <script>
+            function draw(){
+                let canvas = document.getElementById('canvas');
+                let ctx = canvas.getContext('2d');
+
+                // Create our image
+                let sky = new Image();
+                sky.src = 'C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\mario-design\\sky.png'
+                
+                let floor = new Image();
+                floor.src= 'C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\mario-design\\floor.png'
+                
+                let hills = new Image();
+                hills.src = 'C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\mario-design\\hills.png'
+                
+                let castle = new Image();
+                castle.src = 'C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\mario-design\\New Project.png'
+                
+                let flag = new Image();
+                flag.src = 'C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\mario-design\\flag.png'
+                
+                let mario = new Image();
+                mario.src = 'C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\mario-design\\mario (1).png'
+                // When it loads
+               sky.onload = () => {
+                    // Draw the image onto the context
+                    ctx.drawImage(sky, 0, 0, 400, 600);
+                }
+                floor.onload = () => {
+                    for(var i = 0; i < 400; i+= 80){
+                        ctx.drawImage(floor, i,560,80,40);
+                    }
+                }
+                hills.onload = () => {
+                    for(var i = 0; i < 400; i+= 150){
+                        ctx.drawImage(hills, i,480, 150,80);
+                    }
+                }
+                castle.onload = () => {
+                    ctx.drawImage(castle, 300,460,100,100);
+                }
+                flag.onload = () => {
+                    ctx.drawImage(flag, 240,394, 24,168);
+                }
+                mario.onload = () => {
+                    ctx.drawImage(mario, 30,530,16,32);
+                }
+            }
+        </script>
+    </head>
+    <body onload="draw()">
+        <canvas id="canvas", width="400px", height="600px">
+        </canvas>
+    </body>
+</html>

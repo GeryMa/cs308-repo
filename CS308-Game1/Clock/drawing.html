@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>drawing</title>
+        <style>
+            canvas{
+                border: 1px solid black;
+            }
+        </style>
+        <script>
+            var yogi=new image();
+            yogi.src="C:\\Users\\Dr3am\\Downloads\\20220525_211500.jpg";
+            function draw(){
+                var canvas = document.getElementById('canvas');
+                var ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                //rectangle method takes 4 parameters
+                //x and y of upper left corner
+                ctx.rect(20,40,50,100);
+                ctx.fillStyle="green";
+                ctx.fill();
+                ctx.strokeStyle="yellow";
+                ctx.stroke();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(150,150,10,10);
+                ctx.fillStyle="orange";
+                ctx.fill();
+                ctx.closePath();
+
+                ctx.beginPath();
+
+                    ctx.moveTo(200, 0);
+                    ctx.lineTo(200,200);
+                    ctx.lineTo(300,400);
+                    ctx.fill();
+                    ctx.stroke();
+                ctx.closePath();
+ //.arc(xpos, ypos, radius, arcstart, arced, direction
+                    //xpos and ypos are center
+                    //radius
+                    //arcstart and arcend are in radians
+                    //direction -> true = counterclockwise
+                    //false == clockwise
+
+                ctx.beginPath();
+                   
+                    ctx.arc(200,150, 40, .5*Math.PI, 2*Math.PI, true);
+                    ctx.fillStyle="green";
+                    ctx.fill();
+                    ctx.stroke();
+                ctx.closePath();
+
+                ctx.beginPath();
+                    //ctx.fillStyle("blue");
+                    //ctx.font="20px Arial";
+                    ctx.fillText("this is text", 250, 20);
+                ctx.closePath();
+                ctx.beginPath();
+                    //ctx.font="30px Times new Roman";
+                    ctx.strokeText("More Text", 250,50);
+                ctx.closePath();
+
+                ctx.beginPath();
+                    ctx.drawImage(yogi, 200,200);
+                ctx.closePath();
+            }
+        </script>
+    </head>
+    <body onload="draw()">
+        <canvas id="canvas", width="400px", height="300px">
+        </canvas>
+
+    </body>
+</html>
