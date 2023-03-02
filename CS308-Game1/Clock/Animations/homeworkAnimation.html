@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Canvas animation</title>
+        <script>/*
+            var woman=new Image();
+            woman.src="C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\Animations\\woman.png";
+            var man = new Image();
+            man.src="C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\Animations\\walkingMan.png";
+
+            var wX, wY, mX, mY;
+            var wW, wH, mW, mH;
+
+            function initialize(){
+                wX = canvas.width;
+                wY = canvas.height/2;
+                canvas=document.getElementById('animation');
+                ctx=canvas.getContext('2d');
+                timer=0;
+                
+                //update();
+            }*/
+            
+                var woman=new Image();
+                woman.src="C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\Animations\\woman.png";
+        
+                //the location of the cat on the canvas
+                var womanX, womanY;
+                
+                //the number of frames in the sprite
+                var womanNumFrames;
+                
+                //the width and height of a frame
+                var womanFrameW, womanFrameH;
+                
+                //the current frame of the cat (values 0-6)
+                var womanCurrentFrame;
+
+                function initialize(){
+                    canvas=document.getElementById('animation');
+                    ctx=canvas.getContext('2d');
+                    womanX=50;
+                    womanY=50;
+                    catNumFrames=0;
+                    catFrameW=67;
+                    catFrameH=128;
+                    catCurrentFrame=0;  //start at the beginning
+                    woman.onload = () => {
+                        ctx.drawImage(woman, womanCurrentFrame*womanFrameW, 0, womanFrameW, womanFrameH, womanX, womanY, womanFrameW, womanFrameH);
+                    }
+                    update();
+                }
+                function update(){
+                    womanX++;
+
+                    draw();
+                }
+                function draw(){
+                    woman.onload = () => {
+                        ctx.drawImage(woman, womanCurrentFrame*womanFrameW, 0, womanFrameW, womanFrameH, womanX, womanY, womanFrameW, womanFrameH);
+                    }
+                }
+            
+        </script>
+    </head>
+    <body onload='initialize()'>
+        <canvas id="animation" width = '400px' height='300px'></canvas>
+    </body>
+</html>

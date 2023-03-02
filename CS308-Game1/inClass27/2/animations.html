@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>title</title>
+    <script>
+        //declare all of our variables
+        //vars declared here have a scope of all code
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext('2d');
+        var timing;
+        
+        function initialize(){
+            timing = 0;
+
+            update();
+        }
+        function update(){
+
+            draw();
+            requestAnimationFrame(update);
+        }
+        function draw(){
+            //draws shit
+            ctx.clearRect(0,0,400, 300);
+                ctx.rect(50,50,20,20);
+                //ctx.fillStyle = "orange";
+                ctx.fill();
+        }
+        //draw image function for sprites
+        /*
+            image - image var from open code
+            xpos in the sprite image
+            ypos in the sprite image
+            cell width
+            cell height
+            xpos to draw on the canvas
+            ypox to draw on canvas
+            width of image]
+            height of image
+            var sonic2 = new image();
+            sonic2.src = "sonic2.png"
+            var sonx, sony, sonframe, sonframeW sonFrameH
+
+            sonx = 0;
+            sony = 200;
+            sonframe = 0;
+            sonframeW = 37
+            sonFrameH = 40
+            
+        */
+    </script>
+    <style>
+        #canvas{
+            border: 1px solid black;
+        }
+    </style>
+    </head>
+    <body onload="initialize">
+        <canvas id='canvas' width="400" height="300px"></canvas>
+    </body>
+</html>

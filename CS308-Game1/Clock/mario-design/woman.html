@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>woman</title>
+        <style>
+            canvas{
+                border: 1px solid black;
+            }
+        </style>
+        <script>
+            function draw(){
+                let canvas = document.getElementById('canvas');
+                let ctx = canvas.getContext('2d');
+
+                let woman = new Image();
+                woman.src = 'C:\\Users\\Dr3am\\VsCode projects\\CS308-Repo\\cs308-repo\\CS308-Game1\\Clock\\Animations\\woman.png';
+                woman.onload = loadImages();
+
+                function animate(){
+                    ctx.clearRect(0,0,400,600);
+                    requestAnimationFrame(anime);
+                }
+
+                let numOfImages = 1;
+                function loadImages(){
+                    if(--numOfImages > 0) return;
+                }
+                
+            }
+        </script>
+    </head>
+    <body onload="draw()">
+        <canvas id="canvas" width="400px" height="600px"></canvas>
+    </body>
+</html>
