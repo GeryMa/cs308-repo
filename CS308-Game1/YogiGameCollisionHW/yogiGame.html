@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Game Objects Investigation</title>
+		<style>
+			canvas{
+				border:1px solid black;
+			}
+		</style>
+		<script src='player.js'></script>
+		<script src='basket.js'></script>
+		<script>
+			function keyUpHandler(e){
+				switch(e.keyCode){
+					case 37: keys.left=false; break;
+					case 39: keys.right=false; break;
+				}
+			
+			}
+			function keyDownHandler(e){
+				switch(e.keyCode){
+					case 37: keys.left=true; break;
+					case 39: keys.right=true; break;
+				}
+			}
+			//game vars
+			var canvas, ctx;
+			var timing;
+			var score;
+			var score2 = 0;
+			
+			//yogi vars
+			var yogiImg=new Image();
+			yogiImg.src="yogiwalk_2dir.png";
+			var yogi;
+			
+			//background vars
+			var bkgrnd=new Image();
+			bkgrnd.src='forest.png';
+			
+			//key variables
+			var keys;
+			
+			var collided = false;
+			
+			//baskets
+			var basketImg=new Image();
+			basketImg.src="basket.png";
+			var baskets;
+				
+			
+			function initialize(){
+				//game vars
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				timing=0;
+				level=1;
+				
+				//key vars
+				keys={
+					right:false,
+					left:false
+				};
+				
+				//yogi vars
+				yogi=new SpritePlayer(canvas.width/4, 220, 3, yogiImg, 32, 62, 11);
+				
+				//baskets
+				baskets=[];
+				
+				
+				
+				//add  our key listeners
+				document.addEventListener("keydown", keyDownHandler);
+				document.addEventListener("keyup", keyUpHandler);
+				
+				
+				update();
+			}
+			
+			function update(){
+				//game vars
+				timing++;
+				//console.log(timing);
+				
+				//yogi vars
+				yogi.move(canvas, keys, timing);
+				
+				//baskets
+				for(var x=0; x<baskets.length; x++){
+					baskets[x].move();
+					if(baskets[x].y>canvas.height){
+						baskets.splice(x, 1);
+						score2++;
+					}
+					
+					//yl<=br && yr>=bl && yt<=bb && yb>=bt
+					if(yogi.x<=baskets[x].x+baskets[x].img.width &&
+					   yogi.x+yogi.frameW>=baskets[x].x &&
+					   yogi.y<=baskets[x].y+baskets[x].img.height &&
+					   yogi.y+yogi.frameH>=baskets[x].y){
+							collided = true;
+					   }
+				}
+				
+				//add basket every 1 second
+				//use random x and random speed .5-2.5
+				if(timing % 600 == 0){
+					level++;
+				}
+					if(timing%60==0){
+						baskets.push(new Basket(basketImg, parseInt(Math.random()*(canvas.width-2*basketImg.width)), level));
+					}	
+				
+				
+				draw();
+				if(collided == false){
+					requestAnimationFrame(update);
+				}
+			}
+			function draw(){
+				//background
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				ctx.drawImage(bkgrnd,0,0, canvas.width, canvas.height);
+				
+				//yogi
+				yogi.draw(ctx);
+				
+				//baskets
+				baskets.forEach(function(basket){
+					basket.draw(ctx);
+				});
+				
+				//score
+				ctx.beginPath();
+					ctx.rect(0,0,30, 30);
+					ctx.fillStyle="black";
+					ctx.fill();
+					ctx.strokeStyle="white";
+					ctx.strokeText(level, 10, 15);
+				ctx.closePath();
+				ctx.beginPath();
+					ctx.rect(30,0,30,30);
+					ctx.fillStyle="black";
+					ctx.fill();
+					ctx.strokeStyle="white";
+					ctx.strokeText(score2, 40,15)
+				ctx.closePath();
+			}
+
+		</script>
+	</head>
+	<body onload='initialize()'>
+		<canvas id='game' width='400px' height='300px'></canvas>
+	</body>
+</html>
