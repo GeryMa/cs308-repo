@@ -5,7 +5,9 @@
 	</head>
 	<body onload='initialize()'>
 		<canvas id='streetFight' width='750px' height='350px'></canvas>
-		
+		<audio src="jungle-explorer-video-game-theme-141773.mp3" type="audio/mpeg" id="bgMusic" preload='auto' controls='none' style='display:none' autoplay='true' loop='true'></audio> 
+		<audio src="mixkit-arrow-whoosh-1491.wav" type="audio/mpeg" id="punch" preload='auto' controls='none' style='display:none'></audio>
+		<audio src="mixkit-player-jumping-in-a-video-game-2043.wav" id="jump" preload='auto' controls='none' style='display:none'></audio>
 		<script>
 			var mickyX, mickyY;
 			var mickyFrameX, mickyFrameY;
@@ -22,6 +24,11 @@
 			
 			var micky=new Image();
 			micky.src='mickySprite.png';
+
+			//sounds
+			var bgMusic;
+			var jump;
+			var punch;
 			
 			function initialize(){
 				mickyX=500;
@@ -34,6 +41,13 @@
 				canvas=document.getElementById('streetFight');
 				ctx=canvas.getContext('2d');
 				timing=0;
+
+				//sounds
+				bgMusic=document.getElementById('bgMusic');
+				bgMusic.play();
+
+				punch = document.getElementById('punch');
+				jump = document.getElementById('jump');
 				
 				leftKey=false;
 				rightKey=false;
@@ -82,6 +96,7 @@
 					}
 					else if(mickyJumping && timing%7==0){
 						mickyJumpCount++;
+						jump.play();
 						switch(mickyJumpCount){
 							case 1: mickyY-=15; break
 							case 2: mickyY-=8; break
@@ -105,6 +120,8 @@
 					}
 					else if(mickyAttack && timing %7==0){
 						mickyAttackCount++;
+						punch.play();
+
 						//no movement except frames
 					}
 					
