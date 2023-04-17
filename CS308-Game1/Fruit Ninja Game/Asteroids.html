@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Asteroids</title>
+		<style>
+			canvas{
+				border:1px solid black;
+			}
+		</style>
+        <script src="Player.js"></script>
+		<script src="Enemy.js"></script>
+		<script>
+			function keyUpHandler(e){
+				switch(e.keyCode){
+					case 87:keys.W = false; break;
+					case 65:keys.A = false; break;
+					case 83:keys.S = false; break;
+					case 68:keys.D = false; break;
+				}
+			
+			}
+			function keyDownHandler(e){
+				switch(e.keyCode){
+					case 87:keys.W = true;break;
+					case 65:keys.A = true;break;
+					case 83:keys.S = true;break;
+					case 68:keys.D = true;break;
+				}
+			}
+			//game vars
+			var canvas, ctx;
+			var timing;
+			var level = 1;
+			var enemiesPerLvl = 5;
+			
+			//key variables
+			var keys;
+			//player variable
+			var p1;
+			//enemy variables
+			var enemies = []; 
+			var score = 30;
+			var collided = false;
+
+			var star = new Image();
+			star.src="Daco_4156515.png";
+			var starW = 50;
+			var starH = 50;
+
+			function initialize(){
+				//game vars
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				timing=0;
+				
+				p1 = new Player(canvas.width/2 - 25, canvas.height/2 - 25, 3, 25,25);
+
+				//key vars
+				keys={
+					W:false,
+					A:false,
+					S:false,
+					D:false
+				};
+				//p1 = new Player(canvas.width/2, casanvas.height/2, 3, 30,30);
+
+				//add  our key listeners
+				document.addEventListener("keydown", keyDownHandler);
+				document.addEventListener("keyup", keyUpHandler);
+				
+				update();
+			}
+			function update(){
+				//game vars
+				timing++;	
+				if(timing % level == 0){
+					if(enemies.length <= enemiesPerLvl){
+						let xPos = Math.floor(Math.random() * 3) + 1;
+						let yCoinToss = Math.floor(Math.random() * 2) + 1;
+						let size = Math.floor(Math.random() * 30) + 10;
+						if(xPos == 1 ){ // x will have to be 0
+							enemies.push(new Enemy(0, Math.floor(Math.random() * 399) + 1, p1.x, p1.y, level, size, size));
+						}else if(xPos == 2){ //x will be random between 1 and 399
+							if(yCoinToss == 1){ //y = 0
+								enemies.push(new Enemy(Math.floor(Math.random() * 399) + 1, 0, p1.x,p1.y, level, size, size));
+							}else {//y =400
+								enemies.push(new Enemy(Math.floor(Math.random() * 399) + 1, 400, p1.x,p1.y, level, size, size));
+							}
+						}else if(xPos == 3){//x will be 400
+							enemies.push(new Enemy(400, Math.floor(Math.random() * 399) + 1, p1.x, p1.y, level, size, size));
+						}
+					}
+				}
+				
+				for(var x=0; x<enemies.length; x++){
+					enemies[x].updatePosition();
+	
+					if(enemies[x].y>canvas.height || enemies[x].y < 0 || enemies[x].x > canvas.width || enemies[x].x < 0){
+						enemies.splice(x, 1);
+						score++;
+					}
+					
+					try{ // this try is essential because it will throw an Uncaught TypeError but the try statement gets rid of it
+						//i think the reason for this is because sometimes it tries to do the getX at the exact time that one gets removed and doesn't have time to update
+					if(p1.getX()<=enemies[x].getX()+enemies[x].width &&
+						p1.getX()+p1.width>=enemies[x].getX() &&
+						p1.y<=enemies[x].y+enemies[x].height &&
+						p1.y+p1.height>=enemies[x].y){
+							collided = true;
+						}
+					}
+					catch(error){ //no eror catch code because i don't need anything to be done. 
+
+					}
+					if(score > 30){
+						checkEnemyCollision();
+					}
+				}
+				
+				if(timing % 600 == 0){ 
+					level++;
+					enemiesPerLvl++; //increases the total number of asteroids that can be spawned
+				}
+				p1.move(keys);
+				draw();
+				if(collided == false){ //ends animation when collision happens
+					requestAnimationFrame(update);
+				}else{ //draws the stars
+					if(score >= 50){
+						ctx.drawImage(star, canvas.width/2 - 30, canvas.height/2 - starH, starW, starH);
+						ctx.drawImage(star, canvas.width/2 - starW - 35, canvas.height/2 - starH, starW, starH);
+						ctx.drawImage(star, canvas.width/2 + starW - 25, canvas.height/2 - starH, starW, starH);
+					}else if(score >= 35){
+						ctx.drawImage(star, canvas.width/2 - starW - 15, canvas.height/2 - starH, starW, starH);
+						ctx.drawImage(star, canvas.width/2, canvas.height/2 - starH, starW, starH);
+						console.log("")
+					}else if(score >= 20){
+						ctx.drawImage(star, canvas.width/2 - 30, canvas.height/2 - starH - 30, starW, starH);
+					}
+				}
+
+			}
+			function draw(){
+				//background
+				ctx.clearRect(0,0,canvas.width, canvas.height);	
+				//background
+					
+				ctx.beginPath();
+					ctx.fillStyle = "black";
+					ctx.fillRect(0,0,canvas.width, canvas.height)
+				ctx.closePath();	
+				
+				p1.draw(ctx);
+				//e1.draw(ctx);
+				ctx.beginPath();
+					ctx.fillStyle = "white";
+					ctx.font = "bold 20px arial";
+					ctx.fillText(score, canvas.width/2 - 20, 20);
+				ctx.closePath();
+				enemies.forEach(function(enemies){
+					enemies.draw(ctx);
+				});
+				
+			}
+			function checkEnemyCollision(){
+				for(var i = 0; i < enemies.length; i++){
+					for(var j = i + 1; j < enemies.length; j++){
+						if(enemies[i].getX() <= enemies[j].getX() + enemies[j].width &&
+							enemies[i].getX() + enemies[i].width >= enemies[j].getX() &&
+							enemies[i].y <= enemies[j].y + enemies[j].height &&
+							enemies[i].y + enemies[i].height >= enemies[j].y){
+								// Collision detected between enemies[i] and enemies[j]
+								// Reverse their direction
+								enemies[i].reverseDirection();
+								enemies[j].reverseDirection();
+						}
+					}
+				}
+			}
+		</script>
+	</head>
+	<body onload='initialize()'>
+		<canvas id='game' width='400px' height='400px'></canvas>
+	</body>
+</html>

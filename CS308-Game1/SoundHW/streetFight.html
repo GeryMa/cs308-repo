@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Street Fight</title>
+	</head>
+	<body onload='initialize()'>
+		<canvas id='streetFight' width='750px' height='350px'></canvas>
+		
+		<script>
+			var mickyX, mickyY;
+			var mickyFrameX, mickyFrameY;
+			var mickyFrameW, mickeyFrameH;
+			var mickyJumping, mickyJumpCount;
+			var mickyAttack, mickyAttackCount;
+			
+			var canvas, ctx, timing;
+			
+			var leftKey, rightKey, downKey, upKey, ltKey;
+			
+			var bkgrnd=new Image();
+			bkgrnd.src='bkgrnd.png';
+			
+			var micky=new Image();
+			micky.src='mickySprite.png';
+			
+			function initialize(){
+				mickyX=500;
+				mickyY=180;
+				mickyFrameX=0;
+				mickyFrameY=0;
+				mickyFrameW=170;
+				mickyFrameH=175;
+				
+				canvas=document.getElementById('streetFight');
+				ctx=canvas.getContext('2d');
+				timing=0;
+				
+				leftKey=false;
+				rightKey=false;
+				downKey=false;
+				upKey=false;
+				ltKey=false;
+				
+				mickyJumping=false;
+				mickyJumpCount=0;
+				mickyAttack=false;
+				mickyAttackCount=0;
+				
+				document.addEventListener('keydown', keyDownHandler);
+				document.addEventListener('keyup', keyUpHandler);
+				
+				update();
+			}
+			function update(){
+				timing++;
+				mickyFrameY=0;
+				mickyFrameCount=4;
+					
+				//move forward
+				if(leftKey){
+					mickyFrameY=1;
+					mickyX-=3;
+				}
+				
+				//move backwards
+				else if(rightKey){
+					mickyFrameY=2;
+					mickyX+=3;
+				}
+				else if(downKey){
+					mickyFrameY=3;
+					mickyFrameCount=1;
+				}
+				
+				if(upKey || mickyJumping){
+					mickyFrameY=4;
+					mickyFrameCount=5;
+					if(!mickyJumping){
+						mickyJumpCount=0;
+						mickyJumping=true;
+						mickyY-=30;
+					}
+					else if(mickyJumping && timing%7==0){
+						mickyJumpCount++;
+						switch(mickyJumpCount){
+							case 1: mickyY-=15; break
+							case 2: mickyY-=8; break
+							case 3: mickyY+=30; break;
+							case 4: mickyY+=23; break;
+						}
+						
+					}
+						
+					if(mickyJumpCount==5)
+						mickyJumping=false;
+					
+				}
+				 
+				if(ltKey || mickyAttack){
+					mickyFrameY=5;
+					mickyFrameCount=7;
+					if(!mickyAttack){
+						mickyAttackCount=0;
+						mickyAttack=true;
+					}
+					else if(mickyAttack && timing %7==0){
+						mickyAttackCount++;
+						//no movement except frames
+					}
+					
+					if(mickyAttackCount==7)
+						mickyAttack=false;
+				}
+				
+				
+				if(timing%7==0 && !mickyJumping)
+					mickyFrameX++;
+				if(mickyJumping)
+					mickyFrameX=mickyJumpCount;
+				mickyFrameX%=mickyFrameCount;
+				
+				draw();
+				requestAnimationFrame(update);
+			}
+			function draw(){
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				ctx.drawImage(bkgrnd, 0, 0);
+				//ctx.drawImage(micky, mickyX, mickyY);
+				ctx.drawImage(micky, mickyFrameX*mickyFrameW, mickyFrameY*mickyFrameH, mickyFrameW, mickyFrameH, mickyX, mickyY, mickyFrameW, mickyFrameH);
+			}
+			function keyDownHandler(e){
+				switch(e.keyCode){
+					case 37: leftKey=true;break;
+					case 38: upKey=true; break;
+					case 39: rightKey=true;break;
+					case 40: downKey=true; break;
+					case 188: ltKey=true; break;
+				}
+			}
+			function keyUpHandler(e){
+				switch(e.keyCode){
+					case 37: leftKey=false;break;
+					case 38: upKey=false; break;
+					case 39: rightKey=false;break;
+					case 40: downKey=false;break;
+					case 188: ltKey=false; break;
+				}
+			}
+		</script>
+	</body>
+</html>
