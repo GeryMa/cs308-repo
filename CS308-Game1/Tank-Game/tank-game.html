@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tank Game</title>
+		<style>
+			canvas{
+				border:1px solid black;
+			}
+		</style>
+		<script src="walls.js"></script>
+		<script>
+			function keyUpHandler(e){
+				switch(e.keyCode){
+					case 37: keys.left=false; break;
+					case 39: keys.right=false; break;
+				}
+			
+			}
+			function keyDownHandler(e){
+				switch(e.keyCode){
+					case 37: keys.left=true; break;
+					case 39: keys.right=true; break;
+				}
+			}
+			function mousePressed(e){
+				var clickX=e.clientX;
+				var clickY=e.clientY;
+				if(mode=="start"){
+					console.log(clickX + ", " + clickY);
+                    //canvas.width/2 - 50, canvas.height/2 - 50
+					if(clickX > 258 && clickX < 358 && clickY > 258 && clickY < 300){	
+                        console.log("got here");
+                        initialize();
+					}
+				}
+			}
+			//game vars
+			var canvas, ctx;
+			var timing;
+			var level = 1;
+			var p1;
+			var p2;
+			var numOfWalls;
+			var wall = [];
+			var usedCords = {"xY":[]}
+			//key variables
+			var keys;	
+			
+			var cont = true;
+			var wallsForLevels = [];
+			function initialize(){
+				//game vars
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				timing=0;
+				level=1;
+				
+				//key vars
+				keys={
+					right:false,
+					left:false
+				};
+				for(let i = 0; i < 4; i++){
+					wallsForLevels[i] = makeWalls();
+				}
+				numOfWalls = level * Math.floor((Math.random() * 8) + 1);
+
+    
+				//add  our key listeners
+				document.addEventListener("keydown", keyDownHandler);
+				document.addEventListener("keyup", keyUpHandler);
+				
+				
+				update();
+			}
+			function makeWalls(){
+				for(var i = 0; i < numOfWalls; i++){
+					let xCord = Math.floor((Math.random()* canvas.width) + 20);
+					let yCord = Math.floor((Math.random() * canvas.height) + 20);
+						checkSameXCord(xCord, usedCords);
+						checkSameYCord(yCord, usedCords);
+					let width = Math.floor((Math.random() * 50) + 10);
+					let height = Math.floor((Math.random() * 50) + 10);
+					usedCords.xY[i]= [xCord, yCord];
+					wall[i] = new walls(xCord, yCord, width, height);
+				}
+				return wall;
+			}
+			
+			function checkSameXCord(xCord, usedCords){
+				for(let i = 0; i < usedCords.xY.length; i++){
+					if(xCord == usedCords.xY[0]){
+						xCord = Math.floor((Math.random()* canvas.width) + 20);
+						xCord = checkSameXCord(xCord, usedCords);
+					}else{
+						return xCord;
+					}
+				}
+			}
+			function checkSameYCord(yCord, usedCords){
+				for(let i = 0; i < usedCords.xY.length; i++){
+					if(yCord == usedCords.xY[1]){
+						yCord = Math.floor((Math.random()* canvas.width) + 20);
+						yCord = checkSameYCord(yCord, usedCords);
+					}else return yCord;
+				}
+			}
+			function update(){
+				//game vars
+				timing++;
+				
+				console.log(numOfWalls);
+                
+					
+				
+				draw();
+					requestAnimationFrame(update);
+			}
+			function draw(){
+				//background
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				//ctx.drawImage(bkgrnd,0,0);
+				//temporary background before i get an image
+                ctx.beginPath();
+					ctx.fillStyle="orange";
+					ctx.fillRect(0,0,canvas.width, canvas.height);
+				ctx.closePath();
+
+				for(let i = 0; i < wallsForLevels[level-1].length; i++){
+					wallsForLevels[level-1][i].draw(ctx);
+				}
+
+			}
+			function startGame(){
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				canvas.addEventListener("click", mousePressed, false);
+
+				mode="start";
+				ctx.beginPath();
+					ctx.fillStyle="black";
+					ctx.fillRect(0,0,canvas.width, canvas.height);
+				ctx.closePath();
+				ctx.beginPath();
+					ctx.fillStyle="white";
+					ctx.fillRect(canvas.width/2 - 50, canvas.height/2 - 50, 100,40);
+				ctx.closePath();
+			}
+			
+		</script>
+	</head>
+	<body onload='startGame()'>
+		<canvas id='game' width='600px' height='600px'></canvas>
+	</body>
+</html>

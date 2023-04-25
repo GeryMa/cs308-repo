@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tank Game</title>
+		<style>
+			canvas{
+				border:1px solid black;
+			}
+		</style>
+		<script src="Wall.js"></script>
+        <script src="Player.js"></script>
+        <script src="Bullet.js"></script>
+		<script>
+			function keyUpHandler(e){
+				switch(e.keyCode){
+					case 87:keys.W = false; break;
+					case 65:keys.A = false; break;
+					case 83:keys.S = false; break;
+					case 68:keys.D = false; break;
+				}
+			
+			}
+			function keyDownHandler(e){
+				switch(e.keyCode){
+					case 87:keys.W = true;break;
+					case 65:keys.A = true;break;
+					case 83:keys.S = true;break;
+					case 68:keys.D = true;break;
+				}
+			}
+			function mousePressed(e){
+				var clickX=e.clientX;
+				var clickY=e.clientY;
+				if(mode=="start"){
+					console.log(clickX + ", " + clickY);
+                    //canvas.width/2 - 50, canvas.height/2 - 50
+					if(clickX > 258 && clickX < 358 && clickY > 258 && clickY < 300){	
+                        initialize();
+                        mode="shooting";
+					}
+				}
+                //if(mode == "shooting"){
+                    console.log("in shooting mousepressed");
+                    if(turns == 1){
+                        p1.shoot(clickX, clickY, ctx);
+                        p1.shot = true;
+                    }else if(turns == 2){
+                        p2.shoot(clickX, clickY,ctx);
+                        p1.shot = true;
+                    }
+                //}
+			}
+			//game vars
+			var canvas, ctx;
+			var timing;
+			var level = 1;
+			var p1;
+			var p2;
+			var numOfWalls;
+            var walls;
+			//key variables
+			var keys;	
+			var mode = "shooting";
+			var cont = true;
+			var wallsForLevels = [];
+
+            var turns = 1; //1 is p1 2 is p2
+
+            
+			function initialize(){
+				//game vars
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				timing=0;
+				level=2;
+				
+				//key vars
+				keys={
+					right:false,
+					left:false
+				};
+                //creates the player
+                p1 = new Player(Math.floor(Math.random() * (canvas.width - 25 - canvas.width/2 - 25) + canvas.width/2 - 25), Math.floor(Math.random() * (25 - canvas.height /2 + 25) + canvas.height / 2 - 25), 3, 25,25, "red", 100, false);
+                p2 = new Player(Math.floor(Math.random() * (canvas.width / 2 - 50) + 50), Math.floor(Math.random() * ((canvas.height - 50) - canvas.height / 2) + canvas.height / 2), 3, 25,25, "green", 100, false);
+                //Math.floor(Math.random() * ((canvas.height - 50) - canvas.height / 2) + canvas.height / 2);
+                //p2 = new Player(Math.floor(Math.random() * (((canvas.width / 2) - 25) - 25) + 25), Math.floor(Math.random() * ((canvas.height - 25) - (canvas.height / 2 + 25)) + 25), 3, 25,25,"red", 100000);
+                //generates the random walls and makes sure that p1 is not inside of a wall
+				numOfWalls = level * Math.floor((Math.random() * 6) + 4);
+                walls = generateWalls(numOfWalls);
+                checkWallSpawnCollision(p2, walls);
+                checkWallSpawnCollision(p1, walls);
+                
+				//add  our key listeners
+				document.addEventListener("keydown", keyDownHandler);
+				document.addEventListener("keyup", keyUpHandler);
+				
+				
+				update();
+			}
+            //checks to see if the player is in a wall and then pushes the player out to the up and left
+            function checkWallSpawnCollision(player, walls) {
+                let collided = true;
+                while (collided) {
+                    collided = false;
+                    for (let x = 0; x < walls.length; x++) {
+                        if (player.x <= walls[x].x + walls[x].width &&
+                        player.x + player.width >= walls[x].getX() &&
+                        player.y <= walls[x].y + walls[x].height &&
+                        player.y + player.height >= walls[x].y) {
+                            collided = true;
+                            player.x++;
+                            player.y--;
+                            break;
+                        }
+                    }
+                }
+                return p1;
+            }
+
+			function update(){
+				//game vars
+				timing++;
+                canvas.addEventListener("click", mousePressed, false);
+				//console.log(turns);
+                //console.log(p1.fuel);
+                if(turns == 1){
+				    p1.move(keys, walls);
+                    p1.shoot();
+                    if(p1.getFuel() <= 0 && p1.shot == true){
+                        turns = 2;
+                    }
+                }else if(turns == 2){
+                    p2.move(keys, walls);
+                    if(p2.getFuel() <= 0 && p2.shot == true){
+                        turns = 1;
+                    }
+                }
+                if(p2.getFuel() <= 0 && p1.getFuel() <= 0){
+                    console.log("got here");
+                    p1.shot = false;
+                    p1.shot = false;
+                    p2.fuel = 100;
+                    p1.fuel = 100;
+                }
+				draw();
+				requestAnimationFrame(update);
+			}
+            
+			function draw(){
+                //background
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                //ctx.drawImage(bkgrnd,0,0);
+                //temporary background before i get an image
+                ctx.beginPath();
+                ctx.fillStyle="orange";
+                ctx.fillRect(0,0,canvas.width, canvas.height);
+                ctx.closePath();
+
+                for(let i = 0; i < walls.length; i++){
+                    walls[i].draw(ctx);
+                }
+                ctx.beginPath();
+                    ctx.fillStyle ="white";
+                    ctx.fillRect(0,0, 50,50);
+                ctx.closePath();
+                ctx.beginPath();
+                    ctx.fillStyle = "black";
+                    ctx.fillText(p1.fuel, 10,10);
+                ctx.closePath();
+                p1.draw(ctx);
+                p2.draw(ctx);
+            }
+			function startGame(){
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				canvas.addEventListener("click", mousePressed, false);
+
+				mode="start";
+				ctx.beginPath();
+					ctx.fillStyle="black";
+					ctx.fillRect(0,0,canvas.width, canvas.height);
+				ctx.closePath();
+				ctx.beginPath();
+					ctx.fillStyle="white";
+					ctx.fillRect(canvas.width/2 - 50, canvas.height/2 - 50, 100,40);
+				ctx.closePath();
+			}
+			function generateWalls(numWalls){
+                let wallsArr = [];
+                for (var i = 0; i < numWalls; i++) {
+                    let breakFlip = Math.floor(Math.random() * ( 2) + 1)
+                    var x = Math.floor(Math.random() * (canvas.width - 50)); // Random x coordinate
+                    var y = Math.floor(Math.random() * (canvas.height - 50)); // Random y coordinate
+                    var width = Math.floor(Math.random() * 100) + 30; // Random width between 10 and 60
+                    var height = Math.floor(Math.random() * 100) + 30; // Random height between 10 and 60
+                    wallsArr.push(new Wall(x, y, width, height, breakFlip)); // Add new wall to walls array
+                }
+                return wallsArr;
+            }
+		</script>
+	</head>
+	<body onload='initialize()'>
+		<canvas id='game' width='600px' height='600px'></canvas>
+	</body>
+</html>

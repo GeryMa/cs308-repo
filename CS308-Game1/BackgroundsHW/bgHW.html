@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Game Backgrounds</title>
+		<style>
+			canvas{
+				border:1px solid black;
+			}
+		</style>
+        <script src="Player.js"></script>
+		<script>
+			function keyUpHandler(e){
+				switch(e.keyCode){
+					case 87:keys.W = false; break;
+					case 65:keys.A = false; break;
+					case 83:keys.S = false; break;
+					case 68:keys.D = false; break;
+				}
+			
+			}
+			function keyDownHandler(e){
+				switch(e.keyCode){
+					case 87:keys.W = true;break;
+					case 65:keys.A = true;break;
+					case 83:keys.S = true;break;
+					case 68:keys.D = true;break;
+				}
+			}
+			//game vars
+			var canvas, ctx;
+			var timing;
+			var score;
+			
+						
+			var bg = new Image();
+            bg.src="bgHW-bg.png";
+            var bgX;
+
+            var bgWalls = new Image();
+            bgWalls.src="bgHW-walls.png";
+			
+			//key variables
+			var keys;
+			
+            //player vars
+			var p1, p1X, p1Y;
+            
+            var walls = [];
+			var collided = false;
+			function initialize(){
+				//game vars
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				timing=0;
+				score=0;
+				
+				//key vars
+				keys={
+					right:false,
+					left:false
+				};		
+                
+                //player vars
+                p1 = new Player(canvas.width/2 - 25, canvas.height/2 - 25);
+
+				
+				//background vars
+				bgX = 0;
+                bgY = 0;
+                
+				walls[0] = {"c1": [190, 10], "c2": [210,50]};
+                walls[1] = {"c1": [190, 100], "c2": [210,350]};
+                walls[2] = {"c1": [10,190], "c2": [140,210]};
+                walls[3] = {"c1": [210,190], "c2": [210,300]};
+                walls[4] = {"c1": [350, 190], "c2": [390,210]};
+
+				//add  our key listeners
+				document.addEventListener("keydown", keyDownHandler);
+				document.addEventListener("keyup", keyUpHandler);
+				
+				
+				update();
+			}
+			
+			function update(){
+				//game vars
+				timing++;
+				//console.log(timing);
+                
+                if (!checkCollision(p1, walls)) {
+                    // If collision detected, revert player's position
+                    p1.move(keys);
+                }
+                if((p1.x + p1.width) >= canvas.width - 10){
+                    bgX+= -1;
+                    for(let i = 0; i< walls.length; i++){
+                        walls[i].c1[0]+=-1;
+                        walls[i].c2[0]+=-1;
+                    }
+                }
+                if(p1.x <= 10 && bgX <= 0){
+                    console.log("got to here");
+                    bgX+=1;
+                    for(let i = 0; i< walls.length; i++){
+                        walls[i].c1[0]+=1;
+                        walls[i].c2[0]+=1;
+                    }
+                }
+                if ((p1.y + p1.height) >= canvas.height) {
+                    bgY -= 1;
+                    for(let i = 0; i< walls.length; i++){
+                        walls[i].c1[1]+=-1;
+                        walls[i].c2[1]+=-1;
+                    }
+                }
+                if (p1.y <= 10 && bgY <= 0) {
+                    bgY += 1;
+                    for(let i = 0; i< walls.length; i++){
+                        walls[i].c1[1]+=1;
+                        walls[i].c2[1]+=1;
+                    }
+                }
+				draw();
+				requestAnimationFrame(update);
+			}
+			function draw(){
+				//background
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				//ctx.drawImage(bkgrnd,0,0);				
+                ctx.drawImage(bg,bgX,bgY);
+                ctx.drawImage(bgWalls, bgX, bgY);
+                p1.draw(ctx);
+
+			}
+            function checkCollision(player, walls) {
+  for (let i = 0; i < walls.length; i++) {
+    var wall = walls[i];
+    // Check for collision with left, right, top, and bottom sides of the wall
+    if (player.x + player.width > wall.c1[0] && player.x < wall.c2[0] &&
+        player.y + player.height > wall.c1[1] && player.y < wall.c2[1]) {
+      // Collision occurred, prevent player movement
+      console.log("collision");
+      return true;
+    }
+  }
+  return false;
+}
+		</script>
+	</head>
+	<body onload='initialize()'>
+		<canvas id='game' width='200px' height='200px'></canvas>
+	</body>
+</html>

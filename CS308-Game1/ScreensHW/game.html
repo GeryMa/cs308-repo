@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Game Objects Investigation</title>
+		<style>
+			canvas{
+				border:1px solid black;
+			}
+		</style>
+		<script src='spritePlayer.js'></script>
+		<script src='background.js'></script>
+		<script>
+			function keyUpHandler(e){
+				switch(e.keyCode){
+					case 37: keys.left=false; break;
+					case 39: keys.right=false; break;
+				}
+			
+			}
+			function keyDownHandler(e){
+				switch(e.keyCode){
+					case 37: keys.left=true; break;
+					case 39: keys.right=true; break;
+				}
+			}
+			function mousePressed(e){
+				var clickX=e.clientX;
+				var clickY=e.clientY;
+				if(mode=="start"){
+					console.log(clickX + ", " + clickY);
+					if(clickX > canvas.width/2 && clickX < canvas.width/2 + 50 && clickY > canvas.height/2 && clickY < canvas.height/2 + 20){
+						initialize();
+					}
+				}
+			}
+			//game vars
+			var canvas, ctx;
+			var timing;
+			var score;
+			
+			//yogi vars
+			var yogiImg=new Image();
+			yogiImg.src="yogiwalk_2dir.png";
+			var yogi;
+			
+			//background vars
+			var bkgrnd=new Image();
+			bkgrnd.src='background2.png';
+			var bg, bg2;
+			
+			var cloudImg=new Image();
+			cloudImg.src='clouds.png';
+			var clouds, clouds2;
+			
+			//key variables
+			var keys;
+			
+
+				
+			
+			function initialize(){
+				//game vars
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				timing=0;
+				score=0;
+				
+				//key vars
+				keys={
+					right:false,
+					left:false
+				};
+				
+				//yogi vars
+				yogi=new SpritePlayer(canvas.width/4, 500, 3, yogiImg, 32, 62, 11);
+				
+				
+				//background vars
+				bg=new Background(bkgrnd, 0, 0, 1429, 599, 3, -1);
+				bg2=new Background(bkgrnd, -1429, 0, 1420, 599, 3, -1);
+				clouds=new Background(cloudImg, 0, 0, 600, 342, 1, -1);
+				clouds2=new Background(cloudImg, -600, 0, 600, 342, 1, -1);
+				
+				
+				//add  our key listeners
+				document.addEventListener("keydown", keyDownHandler);
+				document.addEventListener("keyup", keyUpHandler);
+				
+				
+				update();
+			}
+			
+			function update(){
+				//game vars
+				timing++;
+				//console.log(timing);
+				score++;
+				//yogi vars
+				yogi.move(canvas, keys, timing);
+				
+				bg.move(keys);
+				bg2.move(keys);
+				clouds.move(keys);
+				clouds2.move(keys);
+				
+				console.log(score);
+				levelPopUp(score);
+				
+				
+				draw();
+				requestAnimationFrame(update);
+			}
+			function draw(){
+				//background
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				//ctx.drawImage(bkgrnd,0,0);
+				bg.draw(ctx);
+				bg2.draw(ctx);
+				clouds.draw(ctx);
+				clouds2.draw(ctx);
+				
+				//yogi
+				yogi.draw(ctx);
+				
+
+			}
+			function startGame(){
+				canvas=document.getElementById('game');
+				ctx=canvas.getContext('2d');
+				canvas.addEventListener("click", mousePressed, false);
+
+				mode="start";
+				ctx.beginPath();
+					ctx.fillStyle="black";
+					ctx.fillRect(0,0,canvas.width, canvas.height);
+				ctx.closePath();
+				ctx.beginPath();
+					ctx.fillStyle="white";
+					ctx.fillRect(canvas.width/2, canvas.height/2, 50,20);
+				ctx.closePath();
+			}
+			function levelPopUp(score){
+				if(score == 60){
+					ctx.beginPath();
+						ctx.font="Arial 12px";
+						ctx.fillText(score, canvas.width/2, canvas.height/2, 50);
+					ctx.closePath();
+				}
+			}
+		</script>
+	</head>
+	<body onload='startGame()'>
+		<canvas id='game' width='600px' height='600px'></canvas>
+	</body>
+</html>
