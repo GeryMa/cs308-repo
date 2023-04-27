@@ -1,5 +1,5 @@
 class Player {
-    constructor(x,y,speed, width = 30, height = 30, color, fuel = 100, shot = false){
+    constructor(x,y,speed, width = 30, height = 30, color, fuel = 100, shot = false, img){
         this.x = x;
         this.y = y;
         this.speed = speed;
@@ -8,6 +8,8 @@ class Player {
         this.color = color;
         this.fuel = fuel;
         this.shot = false;
+        this.health = 5;
+        this.img = img;
       }
     move(keys, walls) {
         this.dx = 0;
@@ -97,10 +99,11 @@ class Player {
         return null;
       }
     draw(ctx) {
-      ctx.beginPath();
+      /*ctx.beginPath();
       ctx.fillStyle = this.color;
       ctx.fillRect(this.x, this.y, this.width, this.height);
-      ctx.closePath();
+      ctx.closePath();*/
+      ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
     }
     
     collidesWith(wall) {

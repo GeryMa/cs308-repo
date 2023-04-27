@@ -39,16 +39,16 @@
                         mode="shooting";
 					}
 				}
-                //if(mode == "shooting"){
-                    console.log("in shooting mousepressed");
-                    if(turns == 1){
-                        p1.shoot(clickX, clickY, ctx);
-                        p1.shot = true;
-                    }else if(turns == 2){
-                        p2.shoot(clickX, clickY,ctx);
+               if(mode == "shooting"){ 
+                    if(turns == 1 && p1.shot == false){
+                        bullets.push(new Bullet(p1.x, p1.y, clickX, clickY));
                         p1.shot = true;
                     }
-                //}
+                    if(turns == 2 && p2.shot == false){
+                        bullets.push(new Bullet(p2.x, p2.y, clickX, clickY));
+                        p2.shot = true;
+                    }
+               }
 			}
 			//game vars
 			var canvas, ctx;
@@ -63,9 +63,18 @@
 			var mode = "shooting";
 			var cont = true;
 			var wallsForLevels = [];
+            var bullets = [];
 
             var turns = 1; //1 is p1 2 is p2
 
+            var tank1 = new Image();
+            tank1.src="p1_sprite.png";
+
+            var tank2 = new Image();
+            tank2.src="p2_tank.png";
+            
+            var bg = new Image();
+            bg.src="background.png";
             
 			function initialize(){
 				//game vars
@@ -80,12 +89,9 @@
 					left:false
 				};
                 //creates the player
-                p1 = new Player(Math.floor(Math.random() * (canvas.width - 25 - canvas.width/2 - 25) + canvas.width/2 - 25), Math.floor(Math.random() * (25 - canvas.height /2 + 25) + canvas.height / 2 - 25), 3, 25,25, "red", 100, false);
-                p2 = new Player(Math.floor(Math.random() * (canvas.width / 2 - 50) + 50), Math.floor(Math.random() * ((canvas.height - 50) - canvas.height / 2) + canvas.height / 2), 3, 25,25, "green", 100, false);
-                //Math.floor(Math.random() * ((canvas.height - 50) - canvas.height / 2) + canvas.height / 2);
-                //p2 = new Player(Math.floor(Math.random() * (((canvas.width / 2) - 25) - 25) + 25), Math.floor(Math.random() * ((canvas.height - 25) - (canvas.height / 2 + 25)) + 25), 3, 25,25,"red", 100000);
-                //generates the random walls and makes sure that p1 is not inside of a wall
-				numOfWalls = level * Math.floor((Math.random() * 6) + 4);
+                p1 = new Player(Math.floor(Math.random() * (canvas.width - 25 - canvas.width/2 - 25) + canvas.width/2 - 25), Math.floor(Math.random() * (25 - canvas.height /2 + 25) + canvas.height / 2 - 25), 3, 25,25, "red", 100, false, tank1);
+                p2 = new Player(Math.floor(Math.random() * (canvas.width / 2 - 50) + 50), Math.floor(Math.random() * ((canvas.height - 50) - canvas.height / 2) + canvas.height / 2), 3, 25,25, "green", 100, true, tank2);
+                numOfWalls = level * Math.floor((Math.random() * 6) + 4);
                 walls = generateWalls(numOfWalls);
                 checkWallSpawnCollision(p2, walls);
                 checkWallSpawnCollision(p1, walls);
@@ -123,27 +129,63 @@
                 canvas.addEventListener("click", mousePressed, false);
 				//console.log(turns);
                 //console.log(p1.fuel);
-                if(turns == 1){
+                console.log(p2.shot);
+                if(turns == 1 && bullets.length < 1){
 				    p1.move(keys, walls);
-                    p1.shoot();
+                    //p1.shoot();
                     if(p1.getFuel() <= 0 && p1.shot == true){
                         turns = 2;
+                        p1.shot = false;
+                        p1.fuel = 100;
                     }
-                }else if(turns == 2){
+                }else if(turns == 2 && bullets.length < 1){
                     p2.move(keys, walls);
                     if(p2.getFuel() <= 0 && p2.shot == true){
                         turns = 1;
+                        p2.shot = false;
+                        p2.fuel = 100;
                     }
                 }
-                if(p2.getFuel() <= 0 && p1.getFuel() <= 0){
-                    console.log("got here");
-                    p1.shot = false;
-                    p1.shot = false;
-                    p2.fuel = 100;
-                    p1.fuel = 100;
+                for(let i = 0; i < bullets.length; i++){
+                    bullets[i].updatePosition();
+                }
+                for(let i= 0; i< bullets.length; i++){
+                    if(bullets[i].y > canvas.height || bullets[i].y < 0 || bullets[i].x > canvas.width || bullets[i].x < 0){
+                        bullets.splice(i,1);
+                    }
+                }
+                for (let i = 0; i < bullets.length; i++) {
+                    for (let j = 0; j < walls.length; j++) {
+                        if (bullets[i].x >= walls[j].x && bullets[i].x <= walls[j].x + walls[j].width && bullets[i].y >= walls[j].y && bullets[i].y <= walls[j].y + walls[j].height) {
+                            bullets.splice(i, 1);
+                            if(walls[j].breaks == true){
+                                walls.splice(j,1);
+                            }
+                            break;
+                        }
+                    }
+                }
+                for(let i = 0; i < bullets.length; i++){
+                    if(turns == 1){
+                        if (bullets[i].x >= p2.x && bullets[i].x <= p2.x + p2.width && bullets[i].y >= p2.y && bullets[i].y <= p2.y + p2.height) {
+                            p2.health--;
+                            console.log("collided with p2");
+                            bullets.splice(i,1);
+                        }
+                    }if(turns == 2){
+                        if (bullets[i].x >= p1.x && bullets[i].x <= p1.x + p1.width && bullets[i].y >= p1.y && bullets[i].y <= p1.y + p1.height) {
+                            p1.health--;
+                            console.log("collided with p1");
+                            bullets.splice(i,1);
+                        }
+                    }
                 }
 				draw();
-				requestAnimationFrame(update);
+                if(p1.health > 0 && p2.health > 0){
+				    requestAnimationFrame(update);
+                }else{
+                    initialize();
+                }
 			}
             
 			function draw(){
@@ -151,10 +193,11 @@
                 ctx.clearRect(0,0,canvas.width, canvas.height);
                 //ctx.drawImage(bkgrnd,0,0);
                 //temporary background before i get an image
-                ctx.beginPath();
+                ctx.drawImage(bg, 0,0, canvas.width, canvas.height);
+                /*ctx.beginPath();
                 ctx.fillStyle="orange";
                 ctx.fillRect(0,0,canvas.width, canvas.height);
-                ctx.closePath();
+                ctx.closePath();*/
 
                 for(let i = 0; i < walls.length; i++){
                     walls[i].draw(ctx);
@@ -166,9 +209,23 @@
                 ctx.beginPath();
                     ctx.fillStyle = "black";
                     ctx.fillText(p1.fuel, 10,10);
+                    ctx.fillText(p1.health, 10, 20);
+                ctx.closePath();
+                ctx.beginPath();
+                    ctx.fillStyle ="white";
+                    ctx.fillRect(50,0, 50,50);
+                ctx.closePath();
+                ctx.beginPath();
+                    ctx.fillStyle = "black";
+                    ctx.fillText(p2.fuel, 60,10);
+                    ctx.fillText(p2.health, 60, 20);
                 ctx.closePath();
                 p1.draw(ctx);
                 p2.draw(ctx);
+                for(let i = 0; i < bullets.length; i++){
+                    bullets[i].draw(ctx);
+                }
+
             }
 			function startGame(){
 				canvas=document.getElementById('game');

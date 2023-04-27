@@ -24,11 +24,12 @@ class Bullet{
         this.x += this.velocityX;
         //console.log(this.velocityY);
         this.y += this.velocityY;
-        console.log("got to updatePosition for the bullets");
+        //console.log("got to updatePosition for the bullets");
     }
     draw(ctx){
-        console.log("got to bullet.js draw function");
+        //console.log("got to bullet.js draw function");
         ctx.beginPath();
+            ctx.fillStyle = "yellow";
             ctx.fillRect(this.x, this.y, this.width, this.height);
             //ctx.fill();
         ctx.closePath();
