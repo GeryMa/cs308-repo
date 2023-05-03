@@ -1,5 +1,5 @@
 class Player {
-    constructor(x,y,speed, width = 30, height = 30, color, fuel = 100, shot = false, img){
+    constructor(x,y,speed, width = 30, height = 30, color, fuel = 100, shot = false, img, health){
         this.x = x;
         this.y = y;
         this.speed = speed;
@@ -8,35 +8,34 @@ class Player {
         this.color = color;
         this.fuel = fuel;
         this.shot = false;
-        this.health = 5;
+        this.health = health;
         this.img = img;
       }
     move(keys, walls) {
         this.dx = 0;
         this.dy = 0;
-
-        if (keys.A && this.fuel > 0) {
+        if (keys.A && this.fuel > 0 && this.x > 0) {
             this.dx = -this.speed;
             this.fuel--;
             if (this.checkWallCollision(this, walls)) {
                 this.dx = 0;
             }
         }
-        if (keys.D && this.fuel > 0) {
+        if (keys.D && this.fuel > 0 && (this.x + this.width) < canvas.width) {
             this.dx = this.speed;
             this.fuel--;
             if (this.checkWallCollision(this, walls)) {
                 this.dx = 0;
             }
         }
-        if (keys.W && this.fuel > 0) {
+        if (keys.W && this.fuel > 0 && this.y > 0) {
             this.dy = -this.speed;
             this.fuel--;
             if (this.checkWallCollision(this, walls)) {
                 this.dy = 0;
             }
         }
-        if (keys.S && this.fuel > 0) {
+        if (keys.S && this.fuel > 0 && (this.height + this.y) < canvas.height) {
             this.dy = this.speed;
             this.fuel--;
             if (this.checkWallCollision(this, walls)) {
